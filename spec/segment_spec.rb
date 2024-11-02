@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe SpaceInvaders::Segment do
-  let(:source) do
+  let(:invader_source) do
     <<~SEGMENT.strip
       ~~~~
       --o-----o--
@@ -16,8 +16,20 @@ RSpec.describe SpaceInvaders::Segment do
     SEGMENT
   end
 
-  let(:corrupted_source) do
-    <<~INVADER.strip
+  let(:segment) { described_class.new(x: 1, y: 2, source: invader_source) }
+
+  it 'builds segment from the source' do
+    expect(segment.to_s).to eq(invader_source)
+    expect(segment.coordinates).to eq({ x: 1, y: 2 })
+  end
+
+  it 'matches invader with 100% similarity' do
+    invader = SpaceInvaders::Invader.new(name: 'face', source: invader_source)
+    expect(segment.match?(invader:)).to be(true)
+  end
+
+  it 'matches corrupted invader' do
+    source = <<~INVADER.strip
       ~~~~
       --o--------
       -------o---
@@ -29,10 +41,44 @@ RSpec.describe SpaceInvaders::Segment do
       ---oo-oo---
       ~~~~
     INVADER
+    invader = SpaceInvaders::Invader.new(name: 'face', source:)
+    expect(segment.match?(invader:)).to be(true)
   end
 
-  let(:wrong_source) do
-    <<~INVADER.strip
+  it 'matches partial invader' do
+    partial_row_source = <<~INVADER.strip
+      ~~~~
+      -----------
+      -----------
+      -----------
+      --o--------
+      -------o---
+      --oo-oooo--
+      -oo-ooo-oo-
+      oooo-oooooo
+      ~~~~
+    INVADER
+    invader = SpaceInvaders::Invader.new(name: 'face', source: partial_row_source)
+    expect(segment.match?(invader:)).to be(true)
+
+    partial_column_source = <<~INVADER.strip
+      ~~~~
+      ---o-------
+      --o--------
+      oooo-------
+      oo-oo------
+      oooooo-----
+      oooo-o-----
+      ---o-o-----
+      -oo--------
+      ~~~~
+    INVADER
+    invader = SpaceInvaders::Invader.new(name: 'face', source: partial_column_source)
+    expect(segment.match?(invader:)).to be(true)
+  end
+
+  it 'skips the match if the noise is too high' do
+    source = <<~INVADER.strip
       ~~~~
       --o--------
       -------o---
@@ -44,22 +90,7 @@ RSpec.describe SpaceInvaders::Segment do
       ---oo-oo---
       ~~~~
     INVADER
-  end
-
-  let(:segment) { described_class.new(x: 1, y: 2, source:) }
-
-  it 'builds segment from the source' do
-    expect(segment.to_s).to eq(source)
-    expect(segment.coordinates).to eq({ x: 1, y: 2 })
-  end
-
-  it 'matches invader with 100% similarity' do
     invader = SpaceInvaders::Invader.new(name: 'face', source:)
-    expect(segment.match?(invader:)).to be(true)
-  end
-
-  it 'skips the match if the noise is too high' do
-    invader = SpaceInvaders::Invader.new(name: 'face', source: wrong_source)
     expect(segment.match?(invader:)).to be(false)
   end
 end
