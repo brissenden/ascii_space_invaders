@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative '../space_invaders'
+
+input = $stdin.read.scan(/(^~{4}(.|\n)+?~{4}$)/)
+
+invaders = input[..-2].map.with_index do |source, index|
+  SpaceInvaders::Invader.new(name: ['invader', index].join('_'), source: source.join)
+end
+
+radar = SpaceInvaders::Radar.new(source: input.last.join)
+
+detector = SpaceInvaders::Detector.new(radar:)
+invaders.each { detector.add_invader(invader: _1) }
+detector.scan
+detector.print
