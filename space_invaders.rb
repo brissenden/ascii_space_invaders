@@ -8,7 +8,6 @@ module SpaceInvaders
 
   class Radar
     def initialize(source:)
-      # TODO: Add padding on left/right/top/bottom for better edge case handling
       self.source = source.gsub(DEF_PATTERN, '').strip
     end
 
