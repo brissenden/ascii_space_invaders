@@ -4,7 +4,7 @@ require 'mini-levenshtein'
 
 module SpaceInvaders
   DEF_PATTERN = '~~~~'
-  SIMILARITY_THRESHOLD = 0.90
+  SIMILARITY_THRESHOLD = ENV.fetch('SIMILARITY', 0.90).to_f
 
   class Radar
     def initialize(source:)
