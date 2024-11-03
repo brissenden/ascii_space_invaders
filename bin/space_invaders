@@ -9,9 +9,9 @@ invaders = input[..-2].map.with_index do |source, index|
   SpaceInvaders::Invader.new(name: ['invader', index].join('_'), source: source.join)
 end
 
-radar = SpaceInvaders::Radar.new(source: input.last.join)
+segment = SpaceInvaders::Segment.new(source: input.last.join)
 
-detector = SpaceInvaders::Detector.new(radar:)
+detector = SpaceInvaders::Detector.new(segment:)
 invaders.each { detector.add_invader(invader: _1) }
 detector.scan
 detector.print

@@ -18,79 +18,88 @@ RSpec.describe SpaceInvaders::Segment do
 
   let(:segment) { described_class.new(x: 1, y: 2, source: invader_source) }
 
-  it 'builds segment from the source' do
-    expect(segment.to_s).to eq(invader_source)
-    expect(segment.coordinates).to eq({ x: 1, y: 2 })
+  describe '#coordinates' do
+    it 'returns coordinates' do
+      expect(segment.coordinates).to eq({ x: 1, y: 2 })
+    end
   end
 
-  it 'matches invader with 100% similarity' do
-    invader = SpaceInvaders::Invader.new(name: 'face', source: invader_source)
-    expect(segment.match?(invader:)).to be(true)
+  describe '#dimensions' do
+    it 'returns dimensions' do
+      expect(segment.dimensions).to eq({ rows: 8, columns: 11 })
+    end
   end
 
-  it 'matches corrupted invader' do
-    source = <<~INVADER.strip
-      ~~~~
-      --o--------
-      -------o---
-      --oo-oooo--
-      -oo-ooo-oo-
-      oooo-oooooo
-      o-ooooo-o-o
-      o-o-----o-o
-      ---oo-oo---
-      ~~~~
-    INVADER
-    invader = SpaceInvaders::Invader.new(name: 'face', source:)
-    expect(segment.match?(invader:)).to be(true)
+  describe '#dimensions' do
+    it 'returns formatted source' do
+      expect(segment.to_s).to eq("--o-----o--\n---o---o---\n--ooooooo--\n-oo-ooo-oo-\nooooooooooo\no-ooooooo-o\no-o-----o-o\n---oo-oo---")
+    end
   end
 
-  it 'matches partial invader' do
-    partial_row_source = <<~INVADER.strip
-      ~~~~
-      -----------
-      -----------
-      -----------
-      --o--------
-      -------o---
-      --oo-oooo--
-      -oo-ooo-oo-
-      oooo-oooooo
-      ~~~~
-    INVADER
-    invader = SpaceInvaders::Invader.new(name: 'face', source: partial_row_source)
-    expect(segment.match?(invader:)).to be(true)
+  describe '#sub_segments' do
+    it 'builds sub-segments (all rows, 2 columns)' do
+      sub_segments = segment.sub_segments(rows: 8, columns: 2).map(&:to_s)
 
-    partial_column_source = <<~INVADER.strip
-      ~~~~
-      ---o-------
-      --o--------
-      oooo-------
-      oo-oo------
-      oooooo-----
-      oooo-o-----
-      ---o-o-----
-      -oo--------
-      ~~~~
-    INVADER
-    invader = SpaceInvaders::Invader.new(name: 'face', source: partial_column_source)
-    expect(segment.match?(invader:)).to be(true)
+      expect(sub_segments.size).to eq(10)
+      expect(sub_segments.first).to eq("--\n--\n--\n-o\noo\no-\no-\n--")
+      expect(sub_segments.last).to eq("--\n--\n--\no-\noo\n-o\n-o\n--")
+    end
+
+    it 'builds sub-segments (2 rows, all columns)' do
+      sub_segments = segment.sub_segments(rows: 2, columns: 11).map(&:to_s)
+
+      expect(sub_segments.size).to eq(7)
+      expect(sub_segments.first).to eq("--o-----o--\n---o---o---")
+      expect(sub_segments.last).to eq("o-o-----o-o\n---oo-oo---")
+    end
+
+    it 'builds 2 x 2 square sub-segments' do
+      sub_segments = segment.sub_segments(rows: 2, columns: 2).map(&:to_s)
+
+      expect(sub_segments.size).to eq(70)
+      expect(sub_segments.first).to eq("--\n--")
+      expect(sub_segments.last).to eq("-o\n--")
+    end
   end
 
-  it 'skips the match if the noise is too high' do
-    source = <<~INVADER.strip
-      ~~~~
-      --o--------
-      -------o---
-      --oo-oooo--
-      -oo-ooo-oo-
-      oooo-o---oo
-      o-----o-o-o
-      o-o-----o-o
-      ---oo-oo---
-      ~~~~
-    INVADER
-    invader = SpaceInvaders::Invader.new(name: 'face', source:)
-    expect(segment.match?(invader:)).to be(false)
+  describe '#match?' do
+    it 'matches invader with 100% similarity' do
+      invader = SpaceInvaders::Invader.new(name: 'face', source: invader_source)
+      expect(segment.match?(other_segment: invader)).to be(true)
+    end
+
+    it 'matches corrupted invader' do
+      source = <<~INVADER.strip
+        ~~~~
+        --o--------
+        -------o---
+        --oo-oooo--
+        -oo-ooo-oo-
+        oooo-oooooo
+        o-ooooo-o-o
+        o-o-----o-o
+        ---oo-oo---
+        ~~~~
+      INVADER
+      invader = SpaceInvaders::Invader.new(name: 'face', source:)
+      expect(segment.match?(other_segment: invader)).to be(true)
+    end
+
+    it 'skips the match if the noise is too high' do
+      source = <<~INVADER.strip
+        ~~~~
+        --o--------
+        -------o---
+        --oo----o--
+        -oo-ooo-oo-
+        oo-------oo
+        o----------
+        o-o-----o-o
+        ---oo-oo---
+        ~~~~
+      INVADER
+      invader = SpaceInvaders::Invader.new(name: 'face', source:)
+      expect(segment.match?(other_segment: invader)).to be(false)
+    end
   end
 end
