@@ -1,6 +1,11 @@
-### Instructions
+#### Prerequisites
 
-The script takes invaders definitions at the beginning and the radar source at the end.
+* `ruby-3.3.4` needs to be installed
+* `bundle install` to install dependencies
+
+#### Instructions
+
+The script takes invader definitions at the beginning (of the input) and the radar source at the end.
 Please see the snippet below for reference.
 
 ```bash
@@ -82,6 +87,6 @@ o--oo------o-----oo--o-oo------------oo--o------o--o-------------oo----o--------
 EOF
 ```
 
-### Notes
+#### Notes
 
 * All the code stay within a single file for simplicity reasons
