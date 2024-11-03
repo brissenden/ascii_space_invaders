@@ -155,8 +155,17 @@ module SpaceInvaders
       end
     end
 
-    def print
-      puts results
+    def summary
+      segment.total_rows.times do |x|
+        segment.total_columns.times do |y|
+          if results.any? { _1[:coordinates][:x].include?(x) && _1[:coordinates][:y].include?(y) }
+            print 'x'
+          else
+            print '-'
+          end
+        end
+        puts "\n"
+      end
     end
 
     private

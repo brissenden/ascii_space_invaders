@@ -14,4 +14,4 @@ segment = SpaceInvaders::Segment.new(source: input.last.join)
 detector = SpaceInvaders::Detector.new(segment:)
 invaders.each { detector.add_invader(invader: _1) }
 detector.scan
-detector.print
+detector.summary
